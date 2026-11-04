@@ -1,0 +1,23 @@
+# env: never commit real secrets
+.env
+# python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+# data + results (local runs)
+medha_data/
+.demo-*/
+pytest-of-*/
+.uv-cache/
+.pytest_cache/
+bench/results/
+fixtures/llm_cache/*.json
+!fixtures/llm_cache/.gitkeep
+# frontend
+web/node_modules/
+web/dist/
+# misc
+.DS_Store
+*.db-wal
+*.db-shm

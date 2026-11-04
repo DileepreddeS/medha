@@ -1,0 +1,18 @@
+# Targeted proof: top_v1 must learn a goal-conformant skill (Return
+# {"top": [...]}, not a result path) with goal-primed tests, and top_v2
+# must reuse it. Regression for the 20261104T003612Z gate escape.
+# Usage: uv run python -m bench.run --config c --tasks bench/tasks/top.yaml
+tasks:
+  - id: top_v1
+    family: top_items
+    goal: |
+      Find the top 2 items by revenue in this CSV. Return {"top": [{"item": name, "revenue": N}, ...]} ordered best-first.
+    files: {items_csv: top_v1.csv}
+    expected: {top: [{item: Sandwich, revenue: 120.00}, {item: Latte, revenue: 70.00}]}
+
+  - id: top_v2
+    family: top_items
+    goal: |
+      Find the top 2 items by revenue in this CSV. Return {"top": [{"item": name, "revenue": N}, ...]} ordered best-first.
+    files: {items_csv: top_v2.csv}
+    expected: {top: [{item: Muffin, revenue: 60.00}, {item: Salad, revenue: 55.00}]}

@@ -1,0 +1,25 @@
+# Repair-as-tasks: the 3 sales drifts as plain tasks so config A (no
+# library, no repair) can run them for the A-vs-C repair comparison.
+# (Config C runs the same drifts via bench/tasks/repair.yaml.)
+# Usage: uv run python -m bench.run --config a --tasks bench/tasks/repair_tasks.yaml
+tasks:
+  - id: drift_renamed_column
+    family: sales_summary
+    goal: |
+      Summarize this POS sales CSV. Return {"totals": {"by_category": {category: revenue}, "grand_total": total}, "report_md": path}. Also write a Markdown report that lists every category name.
+    files: {sales_csv: sales_r1.csv}
+    expected: {by_category: {drink: 7.00, food: 9.00}, grand_total: 16.00}
+
+  - id: drift_date_format
+    family: sales_summary
+    goal: |
+      Summarize this POS sales CSV. Return {"totals": {"by_category": {category: revenue}, "grand_total": total}, "report_md": path}. Also write a Markdown report that lists every category name.
+    files: {sales_csv: sales_r2.csv}
+    expected: {by_category: {drink: 7.00, food: 9.00}, grand_total: 16.00}
+
+  - id: drift_currency_symbols
+    family: sales_summary
+    goal: |
+      Summarize this POS sales CSV. Return {"totals": {"by_category": {category: revenue}, "grand_total": total}, "report_md": path}. Also write a Markdown report that lists every category name.
+    files: {sales_csv: sales_r3.csv}
+    expected: {by_category: {drink: 7.00, food: 9.00}, grand_total: 16.00}

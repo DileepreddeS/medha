@@ -1,0 +1,26 @@
+# Live-repair demo: warm with sales_v1/v2, then a drift whose category
+# header ("kind") is outside the author's alias list, so v1 execution
+# fails and the repair path (v2 via gate + replay) must fire.
+# Usage: uv run python -m bench.run --config repair --tasks bench/tasks/repair_demo.yaml
+tasks:
+  - id: sales_v1
+    family: sales_summary
+    goal: |
+      Summarize this POS sales CSV. Return {"totals": {"by_category": {category: revenue}, "grand_total": total}, "report_md": path}. Also write a Markdown report that lists every category name.
+    files: {sales_csv: sales_v1.csv}
+    expected: {by_category: {drink: 7.00, food: 9.00}, grand_total: 16.00}
+
+  - id: sales_v2
+    family: sales_summary
+    goal: |
+      Summarize this POS sales CSV. Return {"totals": {"by_category": {category: revenue}, "grand_total": total}, "report_md": path}. Also write a Markdown report that lists every category name.
+    files: {sales_csv: sales_v2.csv}
+    expected: {by_category: {drink: 6.00, food: 2.50}, grand_total: 8.50}
+
+repair:
+  - id: drift_new_headers
+    family: sales_summary
+    goal: |
+      Summarize this POS sales CSV. Return {"totals": {"by_category": {category: revenue}, "grand_total": total}, "report_md": path}. Also write a Markdown report that lists every category name.
+    files: {sales_csv: sales_r4.csv}
+    expected: {by_category: {drink: 7.00, food: 9.00}, grand_total: 16.00}

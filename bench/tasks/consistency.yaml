@@ -1,0 +1,39 @@
+# Consistency: the SAME sales task 5x. Run under A and C; compare the
+# row digests in results.json. A re-authors every rep (digests may
+# differ); C learns once and reuses (digests should all match).
+# Usage: uv run python -m bench.run --config <a|c> --tasks bench/tasks/consistency.yaml
+tasks:
+  - id: con_rep1
+    family: sales_summary
+    goal: |
+      Summarize this POS sales CSV. Return {"totals": {"by_category": {category: revenue}, "grand_total": total}, "report_md": path}. Also write a Markdown report that lists every category name.
+    files: {sales_csv: sales_v1.csv}
+    expected: {by_category: {drink: 7.00, food: 9.00}, grand_total: 16.00}
+
+  - id: con_rep2
+    family: sales_summary
+    goal: |
+      Summarize this POS sales CSV. Return {"totals": {"by_category": {category: revenue}, "grand_total": total}, "report_md": path}. Also write a Markdown report that lists every category name.
+    files: {sales_csv: sales_v1.csv}
+    expected: {by_category: {drink: 7.00, food: 9.00}, grand_total: 16.00}
+
+  - id: con_rep3
+    family: sales_summary
+    goal: |
+      Summarize this POS sales CSV. Return {"totals": {"by_category": {category: revenue}, "grand_total": total}, "report_md": path}. Also write a Markdown report that lists every category name.
+    files: {sales_csv: sales_v1.csv}
+    expected: {by_category: {drink: 7.00, food: 9.00}, grand_total: 16.00}
+
+  - id: con_rep4
+    family: sales_summary
+    goal: |
+      Summarize this POS sales CSV. Return {"totals": {"by_category": {category: revenue}, "grand_total": total}, "report_md": path}. Also write a Markdown report that lists every category name.
+    files: {sales_csv: sales_v1.csv}
+    expected: {by_category: {drink: 7.00, food: 9.00}, grand_total: 16.00}
+
+  - id: con_rep5
+    family: sales_summary
+    goal: |
+      Summarize this POS sales CSV. Return {"totals": {"by_category": {category: revenue}, "grand_total": total}, "report_md": path}. Also write a Markdown report that lists every category name.
+    files: {sales_csv: sales_v1.csv}
+    expected: {by_category: {drink: 7.00, food: 9.00}, grand_total: 16.00}

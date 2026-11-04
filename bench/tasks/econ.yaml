@@ -1,0 +1,135 @@
+# Reuse economics: 6 families x 3 variants (v3 stanzas copied from
+# mini.yaml heldout). Run under A and C; compare tokens/$/latency on the
+# repeats (v2, v3): A pays full author price every time, C reuses.
+# Usage: uv run python -m bench.run --config <a|c> --tasks bench/tasks/econ.yaml
+tasks:
+  - id: sales_v1
+    family: sales_summary
+    goal: |
+      Summarize this POS sales CSV. Return {"totals": {"by_category": {category: revenue}, "grand_total": total}, "report_md": path}. Also write a Markdown report that lists every category name.
+    files: {sales_csv: sales_v1.csv}
+    expected: {by_category: {drink: 7.00, food: 9.00}, grand_total: 16.00}
+
+  - id: sales_v2
+    family: sales_summary
+    goal: |
+      Summarize this POS sales CSV. Return {"totals": {"by_category": {category: revenue}, "grand_total": total}, "report_md": path}. Also write a Markdown report that lists every category name.
+    files: {sales_csv: sales_v2.csv}
+    expected: {by_category: {drink: 6.00, food: 2.50}, grand_total: 8.50}
+
+  - id: sales_v3
+    family: sales_summary
+    goal: |
+      Summarize this POS sales CSV. Return {"totals": {"by_category": {category: revenue}, "grand_total": total}, "report_md": path}. Also write a Markdown report that lists every category name.
+    files: {sales_csv: sales_v3.csv}
+    expected: {by_category: {drink: 2.00, food: 5.50}, grand_total: 7.50}
+
+  - id: top_v1
+    family: top_items
+    goal: |
+      Find the top 2 items by revenue in this CSV. Return {"top": [{"item": name, "revenue": N}, ...]} ordered best-first.
+    files: {items_csv: top_v1.csv}
+    expected: {top: [{item: Sandwich, revenue: 120.00}, {item: Latte, revenue: 70.00}]}
+
+  - id: top_v2
+    family: top_items
+    goal: |
+      Find the top 2 items by revenue in this CSV. Return {"top": [{"item": name, "revenue": N}, ...]} ordered best-first.
+    files: {items_csv: top_v2.csv}
+    expected: {top: [{item: Muffin, revenue: 60.00}, {item: Salad, revenue: 55.00}]}
+
+  - id: top_v3
+    family: top_items
+    goal: |
+      Find the top 2 items by revenue in this CSV. Return {"top": [{"item": name, "revenue": N}, ...]} ordered best-first.
+    files: {items_csv: top_v3.csv}
+    expected: {top: [{item: Cake, revenue: 44.00}, {item: Pie, revenue: 33.00}]}
+
+  - id: invoice_v1
+    family: invoice_total
+    goal: |
+      Read the supplier invoice PDF and extract the grand total from the TOTAL line. Return {"total": N} as a number.
+    files: {invoice_pdf: invoice_v1.pdf}
+    pdf_lines: ["INVOICE #1001", "Supplier: Acme Beans", "TOTAL: 214.50"]
+    expected: {total: 214.50}
+
+  - id: invoice_v2
+    family: invoice_total
+    goal: |
+      Read the supplier invoice PDF and extract the grand total from the TOTAL line. Return {"total": N} as a number.
+    files: {invoice_pdf: invoice_v2.pdf}
+    pdf_lines: ["INVOICE #1002", "Supplier: Acme Beans", "TOTAL: 99.99"]
+    expected: {total: 99.99}
+
+  - id: invoice_v3
+    family: invoice_total
+    goal: |
+      Read the supplier invoice PDF and extract the grand total from the TOTAL line. Return {"total": N} as a number.
+    files: {invoice_pdf: invoice_v3.pdf}
+    pdf_lines: ["INVOICE #1003", "Supplier: Acme Beans", "TOTAL: 10.00"]
+    expected: {total: 10.00}
+
+  - id: receipts_v1
+    family: receipt_categorization
+    goal: |
+      Categorize each receipt row. Rule: vendor containing "Whole Foods" -> groceries, vendor containing "Shell" -> fuel. Return {"categories": [...]} with one entry per input row, in order.
+    files: {receipts_csv: receipts_v1.csv}
+    expected: {categories: [groceries, fuel, groceries]}
+
+  - id: receipts_v3
+    family: receipt_categorization
+    goal: |
+      Categorize each receipt row. Rule: vendor containing "Whole Foods" -> groceries, vendor containing "Shell" -> fuel. Return {"categories": [...]} with one entry per input row, in order.
+    files: {receipts_csv: receipts_v3.csv}
+    expected: {categories: [groceries, fuel]}
+
+  # Identical repeat (receipts has no third same-rules variant; v2 changes
+  # the rules, which measures miss+learn instead of reuse economics).
+  - id: receipts_v1_repeat
+    family: receipt_categorization
+    goal: |
+      Categorize each receipt row. Rule: vendor containing "Whole Foods" -> groceries, vendor containing "Shell" -> fuel. Return {"categories": [...]} with one entry per input row, in order.
+    files: {receipts_csv: receipts_v1.csv}
+    expected: {categories: [groceries, fuel, groceries]}
+
+  - id: owner_v1
+    family: owner_summary
+    goal: |
+      Write an owner summary (owner_summary.md) for this sales CSV stating the date range covered, the grand total revenue, and the top category by revenue. Write the dates exactly as they appear in the input CSV (same format). Return {"summary_md": path}.
+    files: {sales_csv: sales_v1.csv}
+    expected: {contains: ["2026-10-26", "2026-10-28", "16", "food"]}
+
+  - id: owner_v2
+    family: owner_summary
+    goal: |
+      Write an owner summary (owner_summary.md) for this sales CSV stating the date range covered, the grand total revenue, and the top category by revenue. Write the dates exactly as they appear in the input CSV (same format). Return {"summary_md": path}.
+    files: {sales_csv: sales_v2.csv}
+    expected: {contains: ["10/26/2026", "10/28/2026", "8.5", "drink"]}
+
+  - id: owner_v3
+    family: owner_summary
+    goal: |
+      Write an owner summary (owner_summary.md) for this sales CSV stating the date range covered, the grand total revenue, and the top category by revenue. Write the dates exactly as they appear in the input CSV (same format). Return {"summary_md": path}.
+    files: {sales_csv: sales_v3.csv}
+    expected: {contains: ["11/01/2026", "11/02/2026", "7.5", "food"]}
+
+  - id: stock_v1
+    family: stock_alert
+    goal: |
+      List items that need reordering: rows where qty <= reorder_at. Return {"low_stock": [item, ...]}.
+    files: {inventory_csv: stock_v1.csv}
+    expected: {low_stock: [Milk, Cups]}
+
+  - id: stock_v2
+    family: stock_alert
+    goal: |
+      List items that need reordering: rows where qty <= reorder_at. Return {"low_stock": [item, ...]}.
+    files: {inventory_csv: stock_v2.csv}
+    expected: {low_stock: [Sugar]}
+
+  - id: stock_v3
+    family: stock_alert
+    goal: |
+      List items that need reordering: rows where qty <= reorder_at. Return {"low_stock": [item, ...]}.
+    files: {inventory_csv: stock_v3.csv}
+    expected: {low_stock: [Napkins]}
